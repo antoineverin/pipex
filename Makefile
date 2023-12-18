@@ -29,7 +29,7 @@ MAKE_FLAG	:= --no-print-directory --silent
 
 $(NAME): $(LIBFT) $(OBJS)
 	@echo '* Assembling $(NAME)'
-	@$(CC) $(CFLAGS) $(OBJS) $(INCLD_FLAG) -o $@
+	@$(CC) $(CFLAGS) $(OBJS) $(INCLD_FLAG) $(LIB) -o $@
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo '- Compiling $<'
