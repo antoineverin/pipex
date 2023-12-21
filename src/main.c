@@ -6,7 +6,7 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/20 15:48:44 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/21 16:40:46 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ static int	execute(char *file_path, char *args, int in_fd, int out_fd)
 {
 	int		pid;
 	char	**args_tab;
+	int		child_status;
 
 	args_tab = ft_split(args, ' ');
 	if (!args_tab)
@@ -56,16 +57,16 @@ static int	execute(char *file_path, char *args, int in_fd, int out_fd)
 	pid = fork();
 	if (pid == 0)
 	{
-		if (dup2(in_fd, 1) == -1)
-			return (perror(file_path), exit(1), FALSE);
-		if (dup2(out_fd, 0) == -1)
-			return (perror(file_path), exit(1), FALSE);
+		if (dup2(in_fd, 0) == -1)
+			return (perror("infd"), exit(1), FALSE);
+		if (dup2(out_fd, 1) == -1)
+			return (perror("outfd"), exit(1), FALSE);
 		if (execve(file_path, args_tab, NULL) == -1)
-			return (perror(file_path), exit(1), FALSE);
+			return (perror("execve"), exit(1), FALSE);
 	}
-	waitpid(pid, NULL, 0);
+	waitpid(pid, &child_status, 0);
 	ft_free_split(args_tab);
-	return (TRUE);
+	return (close(in_fd), close(out_fd), TRUE);
 }
 
 /**
@@ -101,27 +102,52 @@ static char	**find_path(char **envp)
 	return (path);
 }
 
-int	main(int argc, char *argv[], char *envp[])
+static int	pipex(char **commands, int size, char **path, int *fds)
 {
 	int		i;
-	char	**path;
 	char	*file;
+	int		pipes[4];
+
+	if (pipe(pipes) != 0 || pipe(pipes + 2) != 0)
+		return (perror("pipex"), FALSE);
+	fd_copy(fds[0], pipes[1]);
+	i = -1;
+	while (++i < size)
+	{
+		file = get_file_path(commands[i], path);
+		if (!file)
+			return (FALSE);
+		if (!execute(file, commands[i], pipes[0], pipes[3]))
+			return (free(file), FALSE);
+		pipes[0] = pipes[2];
+		pipes[1] = pipes[3];
+		if (pipe(pipes + 2) != 0)
+			return (free(file), close(pipes[0]),
+				perror("pipex"), FALSE);
+		free(file);
+	}
+	fd_copy(pipes[0], fds[1]);
+	return (close(pipes[0]), close(pipes[2]), close(pipes[3]), TRUE);
+}
+
+int	main(int argc, char *argv[], char *envp[])
+{
+	char	**path;
+	int		fds[2];
 
 	if (argc <= 4)
 		return (ft_dprintf(2, "Usage: %s input_file cmd1 cmd2 \
 			... cmdn output_file\n", argv[0]), 1);
-	i = -1;
+	fds[0] = open(argv[1], O_RDONLY);
+	if (fds[0] < 0)
+		return (perror(argv[1]), 3);
+	fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
+	if (fds[1] < 0)
+		return (close(fds[0]), perror(argv[argc - 1]), 4);
 	path = find_path(envp);
 	if (!path)
 		return (ft_dprintf(2, "Memory Error\n"), ft_free_split(path), 2);
-	i = 1;
-	while (++i < argc - 1)
-	{
-		file = get_file_path(argv[i], path);
-		if (!execute(file, argv[i], 0, 1))
-			return (3);
-		free(file);
-	}
+	pipex(argv + 2, argc - 3, path, fds);
 	ft_free_split(path);
 	return (0);
 }
