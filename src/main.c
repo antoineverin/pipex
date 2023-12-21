@@ -6,7 +6,7 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/21 16:40:46 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/21 17:23:35 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,18 +21,28 @@ static char	*get_file_path(char *filename, char **path)
 {
 	size_t	i;
 	char	*file_path;
+	int		finded;
 
 	filename = ft_strcut(filename, ' ');
 	i = -1;
+	finded = 0;
 	while (path[++i])
 	{
 		file_path = ft_strjoin(path[i], filename);
 		if (!file_path)
 			return (free(filename), NULL);
-		if (access(file_path, F_OK | X_OK) == 0)
-			return (free(filename), file_path);
+		if (access(file_path, F_OK) == 0)
+		{
+			finded = 1;
+			if (access(file_path, X_OK) == 0)
+				return (free(filename), file_path);
+		}
 		free(file_path);
 	}
+	if (!finded)
+		ft_dprintf(2, "%s: Unknow command\n", filename);
+	else
+		ft_dprintf(2, "%s: Permission denied\n", filename);
 	return (free(filename), NULL);
 }
 
@@ -116,7 +126,8 @@ static int	pipex(char **commands, int size, char **path, int *fds)
 	{
 		file = get_file_path(commands[i], path);
 		if (!file)
-			return (FALSE);
+			return (close(pipes[0]), close(pipes[1]), close(pipes[2]),
+				close(pipes[3]), close(fds[1]), free(file), FALSE);
 		if (!execute(file, commands[i], pipes[0], pipes[3]))
 			return (free(file), FALSE);
 		pipes[0] = pipes[2];
@@ -147,7 +158,8 @@ int	main(int argc, char *argv[], char *envp[])
 	path = find_path(envp);
 	if (!path)
 		return (ft_dprintf(2, "Memory Error\n"), ft_free_split(path), 2);
-	pipex(argv + 2, argc - 3, path, fds);
+	if (!pipex(argv + 2, argc - 3, path, fds))
+		return (ft_free_split(path), 5);
 	ft_free_split(path);
 	return (0);
 }
