@@ -55,7 +55,7 @@ all: $(NAME)
 .PHONY: clean
 clean:
 	@echo '! Removing objs'
-	@rm -rf $(OBJS)
+	@rm -rf $(OBJS) $(OBJS_BONUS)
 
 .PHONY: fclean
 fclean: clean

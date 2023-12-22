@@ -6,7 +6,7 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/22 18:02:15 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/22 19:09:58 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,8 +147,7 @@ int	main(int argc, char *argv[], char *envp[])
 	int		fds[2];
 
 	if ((ft_strncmp(argv[1], "here_doc", 9) == 0 && argc <= 5) || argc <= 4)
-		return (ft_dprintf(2, "Usage: %s input_file cmd1 cmd2 \
-			... cmdn output_file\n", argv[0]), 1);
+		return (ft_dprintf(2, ERROR_USAGE, argv[0], argv[0]), 1);
 	if (ft_strncmp(argv[1], "here_doc", 9) == 0 && argv++ && argc--)
 		fds[0] = here_doc(argv[1]);
 	else

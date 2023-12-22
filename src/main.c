@@ -6,7 +6,7 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/21 17:23:35 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/22 19:03:55 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /**
  * @param filename The name of the file to search from start to first space
  * @param path An array to string wich represent the path env variable
- * @result The file path or NULL if file not exist
+ * @return The file path or NULL if file not exist
 */
 static char	*get_file_path(char *filename, char **path)
 {
@@ -52,6 +52,7 @@ static char	*get_file_path(char *filename, char **path)
  * @param in_fd Fd with input to pass
  * @param out_fd Fd int wich output
  * @param 1 if ended correctly, else 0
+ * @return 1 if ended correctly, else 0
  * TODO: Check if exit exit only child
  * TODO: Send envp ?
 */
@@ -112,6 +113,13 @@ static char	**find_path(char **envp)
 	return (path);
 }
 
+/**
+ * @param commands An array of commands to execute
+ * @param size The size of the array
+ * @param path An array of string wich represent the path env variable
+ * @param fds An array of 2 int wich contains the fd of the input and output
+ * @return 1 if ended correctly, else 0
+*/
 static int	pipex(char **commands, int size, char **path, int *fds)
 {
 	int		i;
@@ -147,8 +155,7 @@ int	main(int argc, char *argv[], char *envp[])
 	int		fds[2];
 
 	if (argc <= 4)
-		return (ft_dprintf(2, "Usage: %s input_file cmd1 cmd2 \
-			... cmdn output_file\n", argv[0]), 1);
+		return (ft_dprintf(2, ERROR_USAGE, argv[0]), 1);
 	fds[0] = open(argv[1], O_RDONLY);
 	if (fds[0] < 0)
 		return (perror(argv[1]), 3);
