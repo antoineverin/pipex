@@ -22,7 +22,14 @@ define SRC :=
 endef
 SRC := $(strip $(SRC))
 
+define SRC_BONUS :=
+	main_bonus.c
+	utils_bonus.c
+endef
+SRC_BONUS := $(strip $(SRC_BONUS))
+
 OBJS		:= $(patsubst %.c,$(OBJS_DIR)/%.o,$(SRC))
+OBJS_BONUS	:= $(patsubst %.c,$(OBJS_DIR)/%.o,$(SRC_BONUS))
 INCLD_FLAG	:= $(addprefix -I,$(INCLUDES))
 MAKE_FLAG	:= --no-print-directory --silent
 
@@ -36,6 +43,11 @@ $(OBJS_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo '- Compiling $<'
 	@mkdir -p $(OBJS_DIR)
 	@$(CC) $(CFLAGS) $(INCLD_FLAG) -c $< -o $@
+
+.PHONY: bonus
+bonus: $(LIBFT) $(OBJS_BONUS)
+	@echo '* Assembling $(NAME) - bonus'
+	@$(CC) $(CFLAGS) $(OBJS_BONUS) $(INCLD_FLAG) $(LIB) -o $(NAME)
 
 .PHONY: all
 all: $(NAME)
