@@ -6,12 +6,12 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:06:37 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/21 18:35:37 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/22 18:53:10 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
+#ifndef PIPEX_BONUS_H
+# define PIPEX_BONUS_H
 
 # include <unistd.h>
 # include <fcntl.h>

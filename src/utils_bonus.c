@@ -6,7 +6,7 @@
 /*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 15:40:04 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/22 18:50:17 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/22 18:54:04 by antoine          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int	fd_copy(int in, int out)
 static char	*get_next_filename(char *name)
 {
 	size_t	len;
+
 	if (!name)
 	{
 		name = ft_calloc(2, sizeof(char));
@@ -50,11 +51,11 @@ static char	*get_next_filename(char *name)
 	return (name);
 }
 
-static char	*find_file_name()
+static char	*find_file_name(void)
 {
 	int		fd;
 	char	*filename;
-	
+
 	filename = get_next_filename(NULL);
 	if (!filename)
 		return (NULL);
