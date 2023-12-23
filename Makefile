@@ -1,6 +1,6 @@
 NAME		:= pipex
 CC			:= cc
-CFLAGS		:= -Wall -Wextra -Werror -g3
+CFLAGS		:= -Wall -Wextra -Werror
 
 SRC_DIR		:= src
 INCLD_DIR	:= includes
