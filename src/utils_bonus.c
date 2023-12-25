@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 15:40:04 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/25 17:13:38 by averin           ###   ########.fr       */
+/*   Updated: 2023/12/25 17:16:58 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,6 @@ int	here_doc(char *del)
 	{
 		while (!oget_next_line(0, &line))
 			;
-		for (int i = 0; line[i]; i++)
-			printf("%d ", line[i]);
 		if (line != NULL && ft_strncmp(line, del, ft_strlen(del) + 1) == 0)
 			break ;
 		ft_dprintf(fd, "%s", line);
