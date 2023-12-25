@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
+/*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/21 15:40:04 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/22 18:54:04 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/25 17:13:38 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,30 +70,33 @@ static char	*find_file_name(void)
 	return (filename);
 }
 
-int	here_doc(char *delimiter)
+int	here_doc(char *del)
 {
 	int		fd;
 	char	*filename;
 	char	*line;
 
-	delimiter = ft_strjoin(delimiter, "\n");
+	del = ft_strjoin(del, "\n");
 	filename = find_file_name();
-	if (!filename || !delimiter)
-		return (free(filename), free(delimiter), -1);
+	if (!filename || !del)
+		return (free(filename), free(del), -1);
 	fd = open(filename, O_WRONLY | O_CREAT, 0666);
 	if (fd < 0)
-		return (free(filename), free(delimiter), -1);
-	while (ft_printf("here_doc > ") && oget_next_line(0, &line))
+		return (free(filename), free(del), -1);
+	while (ft_printf("here_doc > "))
 	{
-		if (ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		while (!oget_next_line(0, &line))
+			;
+		for (int i = 0; line[i]; i++)
+			printf("%d ", line[i]);
+		if (line != NULL && ft_strncmp(line, del, ft_strlen(del) + 1) == 0)
 			break ;
 		ft_dprintf(fd, "%s", line);
 		free(line);
 	}
-	free(line);
 	close(fd);
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
-		return (unlink(filename), free(filename), free(delimiter), -1);
-	return (unlink(filename), free(filename), free(delimiter), fd);
+		return (free(line), unlink(filename), free(filename), free(del), -1);
+	return (free(line), unlink(filename), free(filename), free(del), fd);
 }
