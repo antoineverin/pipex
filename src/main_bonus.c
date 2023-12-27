@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
+/*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/22 19:09:58 by antoine          ###   ########.fr       */
+/*   Updated: 2023/12/27 16:24:24 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,28 +21,21 @@ static char	*get_file_path(char *filename, char **path)
 {
 	size_t	i;
 	char	*file_path;
-	int		finded;
 
 	filename = ft_strcut(filename, ' ');
+	if (!filename || strncmp(filename, "", 1) == 0)
+		return (free(filename), ft_dprintf(2, "Empty command\n"), NULL);
 	i = -1;
-	finded = 0;
 	while (path[++i])
 	{
 		file_path = ft_strjoin(path[i], filename);
 		if (!file_path)
 			return (free(filename), NULL);
-		if (access(file_path, F_OK) == 0)
-		{
-			finded = 1;
-			if (access(file_path, X_OK) == 0)
-				return (free(filename), file_path);
-		}
+		if (access(file_path, F_OK | X_OK) == 0)
+			return (free(filename), file_path);
 		free(file_path);
 	}
-	if (!finded)
-		ft_dprintf(2, "%s: Unknow command\n", filename);
-	else
-		ft_dprintf(2, "%s: Permission denied\n", filename);
+	ft_dprintf(2, "%s: Unknow command\n", filename);
 	return (free(filename), NULL);
 }
 
@@ -52,8 +45,6 @@ static char	*get_file_path(char *filename, char **path)
  * @param in_fd Fd with input to pass
  * @param out_fd Fd int wich output
  * @param 1 if ended correctly, else 0
- * TODO: Check if exit exit only child
- * TODO: Send envp ?
 */
 static int	execute(char *file_path, char *args, int in_fd, int out_fd)
 {
@@ -68,11 +59,14 @@ static int	execute(char *file_path, char *args, int in_fd, int out_fd)
 	if (pid == 0)
 	{
 		if (dup2(in_fd, 0) == -1)
-			return (perror("infd"), exit(1), FALSE);
+			return (ft_free_split(args_tab), close(in_fd), close(out_fd),
+				perror("infd"), FALSE);
 		if (dup2(out_fd, 1) == -1)
-			return (perror("outfd"), exit(1), FALSE);
+			return (ft_free_split(args_tab), close(in_fd), close(out_fd),
+				perror("outfd"), FALSE);
 		if (execve(file_path, args_tab, NULL) == -1)
-			return (perror("execve"), exit(1), FALSE);
+			return (ft_free_split(args_tab), close(in_fd), close(out_fd),
+				perror("execve"), FALSE);
 	}
 	waitpid(pid, &child_status, 0);
 	ft_free_split(args_tab);
