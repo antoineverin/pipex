@@ -1,6 +1,6 @@
 NAME		:= pipex
 CC			:= cc
-CFLAGS		:= -Wall -Wextra -Werror
+CFLAGS		:= -Wall -Wextra -Werror -g3
 
 SRC_DIR		:= src
 INCLD_DIR	:= includes
@@ -18,6 +18,7 @@ INCLUDES := $(strip $(INCLUDES))
 
 define SRC :=
 	main.c
+	utils.c
 endef
 SRC := $(strip $(SRC))
 
@@ -27,9 +28,9 @@ MAKE_FLAG	:= --no-print-directory --silent
 
 ### PROJECT ###
 
-$(NAME): $(LIBFT) $(OBJS)
+$(NAME): $(LIB) $(OBJS)
 	@echo '* Assembling $(NAME)'
-	@$(CC) $(CFLAGS) $(OBJS) $(INCLD_FLAG) -o $@
+	@$(CC) $(CFLAGS) $(OBJS) $(LIB) $(INCLD_FLAG) -o $@
 
 $(OBJS_DIR)/%.o: $(SRC_DIR)/%.c
 	@echo '- Compiling $<'
