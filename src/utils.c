@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2024/01/01 14:18:58 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 15:11:47 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,4 +65,28 @@ char	*get_file_path(char *cmd, char **path)
 	}
 	ft_dprintf(2, "Command '%s' not found\n", cmd);
 	return (free(cmd), NULL);
+}
+
+char	*find_heredoc_file()
+{
+	char	*file;
+	int		size;
+
+	size = 2;
+	file = NULL;
+	file = ft_calloc(size, sizeof(char));
+	if (!file)
+		return (NULL);
+	ft_memset(file, 'a', size - 1);
+	while (access(file, F_OK) != 0 && errno != ENOENT)
+	{
+		free(file);
+		if (++size < 0)
+			return (NULL);
+		file = ft_calloc(size, sizeof(char));
+		if (!file)
+			return (NULL);
+		ft_memset(file, 'a', size - 1);
+	}
+	return (file);
 }

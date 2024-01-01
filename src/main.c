@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/01 14:16:36 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 15:12:54 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,23 +67,53 @@ static int	wait_childs(int pid)
 	return (130);
 }
 
+static int	get_heredoc(char *del)
+{
+	char	*file;
+	char	*line;
+	int		fds[2];
+
+	del = ft_strjoin(del, "\n");
+	file = find_heredoc_file();
+	if (!file || !del)
+		return (free(del), free(file), -1);
+	fds[0] = open(file, O_WRONLY | O_CREAT);
+	fds[1] = open(file, O_RDONLY);
+	(unlink(file), free(file));
+	if (fds[0] < 0 || fds[1] < 0)
+		return (free(del), close(fds[0]), close(fds[1]), -1);
+	while (ft_printf("here_doc > ") && oget_next_line(0, &line))
+	{
+		if (ft_strncmp(line, del, ft_strlen(del) + 1) == 0)
+			break ;
+		(ft_putstr_fd(line, fds[0]), free(line));
+	}
+	return (free(del), free(line), close(fds[0]), fds[1]);
+}
+
 int	main(int argc, char *argv[], char *envp[])
 {
 	char	**path;
 	int		fds[2];
 	int		pid;
 
-	if (argc <= 4)
-		return (ft_dprintf(2, ERROR_USAGE, argv[0]), 1);
-	fds[0] = open(argv[1], O_RDONLY);
+	if ((ft_strncmp(argv[1], "here_doc", 9) == 0 && argc <= 5) || argc <= 4)
+		return (ft_dprintf(2, ERROR_USAGE, argv[0], argv[0]), 1);
+	if (ft_strncmp(argv[1], "here_doc", 9) == 0 && argv++ && argc--)
+		fds[0] = get_heredoc(argv[1]);
+	else
+		fds[0] = open(argv[1], O_RDONLY);
 	if (fds[0] < 0)
 		return (perror(argv[1]), 3);
-	fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
+	if (ft_strncmp(argv[0], "here_doc", 9) == 0)
+		fds[1] = open(argv[argc - 1], O_WRONLY | O_APPEND | O_CREAT, 0666);
+	else
+		fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
 	if (fds[1] < 0)
 		return (close(fds[0]), perror(argv[argc - 1]), 4);
 	path = find_path(envp);
 	if (!path)
-		return (ft_dprintf(2, "Memory Error\n"), 2);
+		return (close(fds[0]), close(fds[1]), ft_dprintf(2, ERROR_MEM), 2);
 	pid = exec_commands(argv + 2, path, argc - 4, fds);
 	return (ft_fsplit(path), wait_childs(pid));
 }
