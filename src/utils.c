@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2023/12/31 22:55:42 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 14:18:58 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	**find_path(char **envp)
 	while (envp[++i] && ft_strncmp("PATH=", envp[i], 5) != 0)
 		continue ;
 	if (!envp[i])
-		return ((char *[]) {"", NULL});
+		return ((char *[]){"", NULL});
 	path = ft_split(ft_strchr(envp[i], '=') + 1, ':');
 	if (!path)
 		return (NULL);
@@ -41,6 +41,10 @@ char	**find_path(char **envp)
 	return (path);
 }
 
+// if (ft_strncmp(cmd, "", 1) == 0)
+// 	return (free(cmd), ft_dprintf("Command %s not found\n", cmd), NULL);
+// if (access(cmd, F_OK | X_OK))
+// 	return (cmd);
 char	*get_file_path(char *cmd, char **path)
 {
 	size_t	i;
@@ -49,10 +53,6 @@ char	*get_file_path(char *cmd, char **path)
 	cmd = ft_strcut(cmd, ' ');
 	if (!cmd)
 		return (free(cmd), ft_dprintf(2, ERROR_MEM), NULL);
-	// if (ft_strncmp(cmd, "", 1) == 0)
-	// 	return (free(cmd), ft_dprintf("Command %s not found\n", cmd), NULL);
-	// if (access(cmd, F_OK | X_OK))
-	// 	return (cmd);
 	i = -1;
 	while (path[++i])
 	{
