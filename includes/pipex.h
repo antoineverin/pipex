@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: antoine <antoine@student.42.fr>            +#+  +:+       +#+        */
+/*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:06:37 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/18 13:09:16 by antoine          ###   ########.fr       */
+/*   Updated: 2024/01/01 14:24:52 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,6 @@
 
 # define ERROR_USAGE "Usage: %s file1 cmd1 cmd2 file2\n"
 # define ERROR_MEM "Memory Error\n"
-
-typedef struct s_command {
-	char	*file;
-	char	**args;
-}	t_command;
 
 char	**find_path(char **envp);
 char	*get_file_path(char *cmd, char **path);
