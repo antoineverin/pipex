@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/01 15:12:54 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 15:25:25 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 
 	file = get_file_path(cmds[0], path);
 	if (!file)
-		return (-1);
+		return (close(fds[0]), -1);
 	args = ft_split(cmds[0], ' ');
 	if (!args)
 		return (ft_dprintf(2, ERROR_MEM), free(file), -1);
@@ -58,8 +58,8 @@ static int	wait_childs(int pid)
 {
 	int	wstatus;
 
-	waitpid(pid, &wstatus, 0);
-	wait(0);
+	if (waitpid(pid, &wstatus, 0) == -1 || wait(0) == -1)
+		return (-1);
 	if (WIFEXITED(wstatus))
 		return (WEXITSTATUS(wstatus));
 	if (pid == -1)
@@ -96,16 +96,18 @@ int	main(int argc, char *argv[], char *envp[])
 	char	**path;
 	int		fds[2];
 	int		pid;
+	int		is_heredoc;
 
-	if ((ft_strncmp(argv[1], "here_doc", 9) == 0 && argc <= 5) || argc <= 4)
+	is_heredoc = ft_strncmp(argv[1], "here_doc", 9) == 0;
+	if ((is_heredoc && argc <= 5) || argc <= 4)
 		return (ft_dprintf(2, ERROR_USAGE, argv[0], argv[0]), 1);
-	if (ft_strncmp(argv[1], "here_doc", 9) == 0 && argv++ && argc--)
+	if (is_heredoc && argv++ && argc--)
 		fds[0] = get_heredoc(argv[1]);
 	else
 		fds[0] = open(argv[1], O_RDONLY);
 	if (fds[0] < 0)
 		return (perror(argv[1]), 3);
-	if (ft_strncmp(argv[0], "here_doc", 9) == 0)
+	if (is_heredoc)
 		fds[1] = open(argv[argc - 1], O_WRONLY | O_APPEND | O_CREAT, 0666);
 	else
 		fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
