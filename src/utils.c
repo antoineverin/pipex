@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2024/01/01 15:11:47 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 15:14:37 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ char	*get_file_path(char *cmd, char **path)
 	return (free(cmd), NULL);
 }
 
-char	*find_heredoc_file()
+char	*find_heredoc_file(void)
 {
 	char	*file;
 	int		size;
