@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2023/12/31 23:02:40 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/01 14:16:36 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,21 +42,36 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 	args = ft_split(cmds[0], ' ');
 	if (!args)
 		return (ft_dprintf(2, ERROR_MEM), free(file), -1);
-	if (pipe(pipedes) == -1 && count != 0)
+	if (count != 0 && pipe(pipedes) == -1)
 		return (perror("pipe"), ft_fsplit(args), free(file), -1);
 	if (count == 0)
 		pipedes[1] = fds[1];
 	pid = exec_child(file, args, fds[0], pipedes[1]);
 	(close(fds[0]), close(pipedes[1]), fds[0] = pipedes[0]);
+	(free(file), ft_fsplit(args));
 	if (count == 0)
 		return (pid);
 	return (exec_commands(cmds + 1, path, count - 1, fds));
+}
+
+static int	wait_childs(int pid)
+{
+	int	wstatus;
+
+	waitpid(pid, &wstatus, 0);
+	wait(0);
+	if (WIFEXITED(wstatus))
+		return (WEXITSTATUS(wstatus));
+	if (pid == -1)
+		return (127);
+	return (130);
 }
 
 int	main(int argc, char *argv[], char *envp[])
 {
 	char	**path;
 	int		fds[2];
+	int		pid;
 
 	if (argc <= 4)
 		return (ft_dprintf(2, ERROR_USAGE, argv[0]), 1);
@@ -68,8 +83,7 @@ int	main(int argc, char *argv[], char *envp[])
 		return (close(fds[0]), perror(argv[argc - 1]), 4);
 	path = find_path(envp);
 	if (!path)
-		return (ft_dprintf(2, "Memory Error\n"), ft_fsplit(path), 2);
-	exec_commands(argv + 2, path, argc - 4, fds);
-	wait(NULL);
-	return (0);
+		return (ft_dprintf(2, "Memory Error\n"), 2);
+	pid = exec_commands(argv + 2, path, argc - 4, fds);
+	return (ft_fsplit(path), wait_childs(pid));
 }
