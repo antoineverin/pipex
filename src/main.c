@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/01 15:25:25 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/02 13:25:45 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 	int		pid;
 
 	file = get_file_path(cmds[0], path);
-	if (!file)
+	if (!file && count == 0)
 		return (close(fds[0]), -1);
 	args = ft_split(cmds[0], ' ');
 	if (!args)
@@ -46,7 +46,8 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 		return (perror("pipe"), ft_fsplit(args), free(file), -1);
 	if (count == 0)
 		pipedes[1] = fds[1];
-	pid = exec_child(file, args, fds[0], pipedes[1]);
+	if (file)
+		pid = exec_child(file, args, fds[0], pipedes[1]);
 	(close(fds[0]), close(pipedes[1]), fds[0] = pipedes[0]);
 	(free(file), ft_fsplit(args));
 	if (count == 0)
@@ -58,12 +59,12 @@ static int	wait_childs(int pid)
 {
 	int	wstatus;
 
+	if (pid == -1)
+		return (127);
 	if (waitpid(pid, &wstatus, 0) == -1 || wait(0) == -1)
 		return (-1);
 	if (WIFEXITED(wstatus))
 		return (WEXITSTATUS(wstatus));
-	if (pid == -1)
-		return (127);
 	return (130);
 }
 
@@ -108,14 +109,12 @@ int	main(int argc, char *argv[], char *envp[])
 	if (fds[0] < 0)
 		return (perror(argv[1]), 3);
 	if (is_heredoc)
-		fds[1] = open(argv[argc - 1], O_WRONLY | O_APPEND | O_CREAT, 0666);
+		fds[1] = open(argv[argc - 1], O_WRONLY | O_APPEND | O_CREAT, 0644);
 	else
-		fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0666);
+		fds[1] = open(argv[argc - 1], O_WRONLY | O_TRUNC | O_CREAT, 0644);
 	if (fds[1] < 0)
 		return (close(fds[0]), perror(argv[argc - 1]), 4);
 	path = find_path(envp);
-	if (!path)
-		return (close(fds[0]), close(fds[1]), ft_dprintf(2, ERROR_MEM), 2);
 	pid = exec_commands(argv + 2, path, argc - 4, fds);
 	return (ft_fsplit(path), wait_childs(pid));
 }

@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2024/01/01 15:14:37 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/02 13:27:31 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	**find_path(char **envp)
 	while (envp[++i] && ft_strncmp("PATH=", envp[i], 5) != 0)
 		continue ;
 	if (!envp[i])
-		return ((char *[]){"", NULL});
+		return (NULL);
 	path = ft_split(ft_strchr(envp[i], '=') + 1, ':');
 	if (!path)
 		return (NULL);
@@ -41,20 +41,20 @@ char	**find_path(char **envp)
 	return (path);
 }
 
-// if (ft_strncmp(cmd, "", 1) == 0)
-// 	return (free(cmd), ft_dprintf("Command %s not found\n", cmd), NULL);
-// if (access(cmd, F_OK | X_OK))
-// 	return (cmd);
 char	*get_file_path(char *cmd, char **path)
 {
 	size_t	i;
 	char	*file_path;
 
 	cmd = ft_strcut(cmd, ' ');
+	if (ft_strchr(cmd, '/') != NULL)
+		return (cmd);
 	if (!cmd)
 		return (free(cmd), ft_dprintf(2, ERROR_MEM), NULL);
+	if (ft_strncmp(cmd, "", 1) == 0)
+		return (ft_dprintf(2, "Command '%s' not found\n", cmd), free(cmd), NULL);
 	i = -1;
-	while (path[++i])
+	while (path != NULL && path[++i])
 	{
 		file_path = ft_strjoin(path[i], cmd);
 		if (!file_path)
