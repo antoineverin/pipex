@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/03 12:59:08 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 13:16:44 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,9 @@ static int	exec_child(char *file, char *cmd, int *fds)
 	{
 		if (dup2(fds[0], 0) == -1 || dup2(fds[1], 1) == -1)
 			return (perror("dup2"), ft_fsplit(args), -1);
-		(close(fds[0]), close(fds[1]), close(fds[2]), close(fds[3]));
+		(close(fds[0]), close(fds[1]));
+		if (fds[2] != -1 && fds[3] != -1)
+			(close(fds[2]), close(fds[3]));
 		if (execve(file, args, NULL) == -1)
 			return (perror("execve"), ft_fsplit(args), -1);
 	}
