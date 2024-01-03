@@ -6,52 +6,54 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/03 11:20:21 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 12:59:08 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	exec_child(char *file, char **args, int *fds)
+static int	exec_child(char *file, char *cmd, int *fds)
 {
-	int	pid;
+	int		pid;
+	char	**args;
 
+	args = ft_split(cmd, ' ');
+	if (!args)
+		return (ft_dprintf(2, ERROR_MEM), -1);
 	pid = fork();
 	if (pid == -1)
 		return (-1);
 	if (pid == 0)
 	{
 		if (dup2(fds[0], 0) == -1 || dup2(fds[1], 1) == -1)
-			return (perror("dup2"), -1);
+			return (perror("dup2"), ft_fsplit(args), -1);
 		(close(fds[0]), close(fds[1]), close(fds[2]), close(fds[3]));
 		if (execve(file, args, NULL) == -1)
-			return (perror("execve"), -1);
+			return (perror("execve"), ft_fsplit(args), -1);
 	}
-	(close(fds[0]), close(fds[1]));
+	(close(fds[0]), close(fds[1]), ft_fsplit(args));
 	return (pid);
 }
 
 static int	exec_commands(char **cmds, char **path, int count, int *fds)
 {
 	char	*file;
-	char	**args;
 	int		pipedes[2];
 	int		pid;
+	int		*child_fd;
 
 	file = get_file_path(cmds[0], path);
 	if (!file && count == 0)
-		return (close(fds[1]), -1);
-	args = ft_split(cmds[0], ' ');
-	if (!args)
-		return (ft_dprintf(2, ERROR_MEM), free(file), -1);
+		return (close(fds[0]), close(fds[1]), -1);
 	if (count != 0 && pipe(pipedes) == -1)
-		return (perror("pipe"), ft_fsplit(args), free(file), -1);
+		return (perror("pipe"), free(file), -1);
 	if (count == 0)
-		pipedes[1] = fds[1];
+		child_fd = (int []){fds[0], fds[1], -1, -1};
+	else
+		child_fd = (int []){fds[0], pipedes[1], pipedes[0], fds[1]};
 	if (file)
-		pid = exec_child(file, args, (int []){fds[0], pipedes[1], pipedes[0], \
-		fds[1]});
-	(free(file), ft_fsplit(args), fds[0] = pipedes[0]);
+		pid = exec_child(file, cmds[0], child_fd);
+	(free(file), fds[0] = pipedes[0]);
 	if (count == 0)
 		return (pid);
 	return (exec_commands(cmds + 1, path, count - 1, fds));
