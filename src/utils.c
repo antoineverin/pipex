@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2024/01/02 13:27:31 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 11:46:00 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ char	*get_file_path(char *cmd, char **path)
 	if (!cmd)
 		return (free(cmd), ft_dprintf(2, ERROR_MEM), NULL);
 	if (ft_strncmp(cmd, "", 1) == 0)
-		return (ft_dprintf(2, "Command '%s' not found\n", cmd), free(cmd), NULL);
+		return (ft_dprintf(2, "Command '%s' not found\n", cmd), \
+		free(cmd), NULL);
 	i = -1;
 	while (path != NULL && path[++i])
 	{
