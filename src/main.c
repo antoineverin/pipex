@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/03 13:16:44 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 13:32:08 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 		child_fd = (int []){fds[0], pipedes[1], pipedes[0], fds[1]};
 	if (file)
 		pid = exec_child(file, cmds[0], child_fd);
+	else
+		(close(fds[0]), close(pipedes[1]));
 	(free(file), fds[0] = pipedes[0]);
 	if (count == 0)
 		return (pid);
