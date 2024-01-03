@@ -6,13 +6,13 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:08:07 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/02 15:49:41 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 11:20:21 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	exec_child(char *file, char **args, int infd, int outfd)
+static int	exec_child(char *file, char **args, int *fds)
 {
 	int	pid;
 
@@ -21,12 +21,13 @@ static int	exec_child(char *file, char **args, int infd, int outfd)
 		return (-1);
 	if (pid == 0)
 	{
-		if (dup2(infd, 0) == -1 || dup2(outfd, 1) == -1)
+		if (dup2(fds[0], 0) == -1 || dup2(fds[1], 1) == -1)
 			return (perror("dup2"), -1);
+		(close(fds[0]), close(fds[1]), close(fds[2]), close(fds[3]));
 		if (execve(file, args, NULL) == -1)
 			return (perror("execve"), -1);
 	}
-	(close(infd), close(outfd));
+	(close(fds[0]), close(fds[1]));
 	return (pid);
 }
 
@@ -39,7 +40,7 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 
 	file = get_file_path(cmds[0], path);
 	if (!file && count == 0)
-		return (close(fds[0]), close(fds[1]), -1);
+		return (close(fds[1]), -1);
 	args = ft_split(cmds[0], ' ');
 	if (!args)
 		return (ft_dprintf(2, ERROR_MEM), free(file), -1);
@@ -48,7 +49,8 @@ static int	exec_commands(char **cmds, char **path, int count, int *fds)
 	if (count == 0)
 		pipedes[1] = fds[1];
 	if (file)
-		pid = exec_child(file, args, fds[0], pipedes[1]);
+		pid = exec_child(file, args, (int []){fds[0], pipedes[1], pipedes[0], \
+		fds[1]});
 	(free(file), ft_fsplit(args), fds[0] = pipedes[0]);
 	if (count == 0)
 		return (pid);
