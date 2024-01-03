@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:08:50 by averin            #+#    #+#             */
-/*   Updated: 2024/01/03 11:46:00 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 13:53:59 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,31 +41,32 @@ char	**find_path(char **envp)
 	return (path);
 }
 
-char	*get_file_path(char *cmd, char **path)
+char	*get_file_path(char *s, char **path)
 {
 	size_t	i;
 	char	*file_path;
 
-	cmd = ft_strcut(cmd, ' ');
-	if (ft_strchr(cmd, '/') != NULL)
-		return (cmd);
-	if (!cmd)
-		return (free(cmd), ft_dprintf(2, ERROR_MEM), NULL);
-	if (ft_strncmp(cmd, "", 1) == 0)
-		return (ft_dprintf(2, "Command '%s' not found\n", cmd), \
-		free(cmd), NULL);
+	s = ft_strcut(s, ' ');
+	if (ft_strchr(s, '/') != NULL && access(s, F_OK | X_OK) == 0)
+		return (s);
+	else if (ft_strchr(s, '/') != NULL && access(s, F_OK | X_OK) != 0)
+		return (ft_dprintf(2, "Command '%s' not found\n", s), free(s), NULL);
+	if (!s)
+		return (free(s), ft_dprintf(2, ERROR_MEM), NULL);
+	if (ft_strncmp(s, "", 1) == 0)
+		return (ft_dprintf(2, "Command '%s' not found\n", s), free(s), NULL);
 	i = -1;
 	while (path != NULL && path[++i])
 	{
-		file_path = ft_strjoin(path[i], cmd);
+		file_path = ft_strjoin(path[i], s);
 		if (!file_path)
-			return (free(cmd), NULL);
+			return (free(s), NULL);
 		if (access(file_path, F_OK | X_OK) == 0)
-			return (free(cmd), file_path);
+			return (free(s), file_path);
 		free(file_path);
 	}
-	ft_dprintf(2, "Command '%s' not found\n", cmd);
-	return (free(cmd), NULL);
+	ft_dprintf(2, "Command '%s' not found\n", s);
+	return (free(s), NULL);
 }
 
 char	*find_heredoc_file(void)
