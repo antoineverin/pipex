@@ -6,7 +6,7 @@
 /*   By: averin <averin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/18 13:06:37 by antoine           #+#    #+#             */
-/*   Updated: 2024/01/01 15:14:42 by averin           ###   ########.fr       */
+/*   Updated: 2024/01/03 09:17:37 by averin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <errno.h>
 # include <sys/wait.h>
 # include <sys/types.h>
+# include <unistd.h>
 # include "libft.h"
 
 # define ERROR_USAGE "Usage: %s file1 cmd1 cmd2 file2\n"
